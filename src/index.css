@@ -1,0 +1,500 @@
+@import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700;900&family=Kaisei+Opti:wght@400;500;700&family=Shippori+Mincho+B1:wght@400;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: 'HYYaKuHeiW';
+    src: local('Noto Sans JP'), local('Hiragino Sans');
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'Adobe Heiti Std';
+    src: local('Hiragino Sans'), local('Yu Gothic');
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'Kozuka Gothic Pr6N';
+    src: local('Kozuka Gothic Pr6N'), local('小塚ゴシック Pr6N'), local('KozGoPr6N-Regular');
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'Kozuka Gothic Pr6N';
+    src: local('Kozuka Gothic Pr6N Bold'), local('小塚ゴシック Pr6N Bold'), local('KozGoPr6N-Bold');
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  html {
+    overflow-y: scroll;
+    scrollbar-gutter: stable;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+  }
+
+  body {
+    @apply text-gray-800 min-h-screen;
+    overflow-x: hidden;
+    font-family: "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, "游ゴシック体", "Yu Gothic", "YuGothic", "ヒラギノ角ゴ ProN", "Hiragino Kaku Gothic ProN", "メイリオ", "Meiryo", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-image: url('/images/back.png');
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed;
+    background-repeat: repeat;
+    margin: 0;
+    padding: 0;
+  }
+
+  #root {
+    margin: 0;
+    padding: 0;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #ef4444 #fef2f2;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: #fef2f2;
+    border-radius: 5px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #ef4444 0%, #f87171 100%);
+    border-radius: 5px;
+    border: 2px solid #fef2f2;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #dc2626 0%, #ef4444 100%);
+  }
+
+  body[data-modal-open] header,
+  body[data-modal-open] > div > header {
+    display: none !important;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Kaisei Opti', 'Zen Kaku Gothic New', 'Shippori Mincho B1', "Noto Sans JP", serif;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  h1 {
+    font-weight: 800;
+  }
+
+  h2 {
+    font-weight: 700;
+  }
+}
+
+@layer utilities {
+  @keyframes shimmer {
+    0% {
+      opacity: 0;
+      transform: translateX(-100%);
+    }
+    50% {
+      opacity: 0.3;
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% {
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+    }
+    50% {
+      box-shadow: 0 0 40px rgba(239, 68, 68, 0.8), 0 0 60px rgba(239, 68, 68, 0.4);
+    }
+  }
+
+  @keyframes scroll-up {
+    0% {
+      transform: translateY(0);
+    }
+    100% {
+      transform: translateY(-33.333%);
+    }
+  }
+
+  .animate-scroll-up {
+    animation: scroll-up 30s linear infinite;
+  }
+
+  @keyframes scroll-step {
+    0%, 15% {
+      transform: translateY(0);
+    }
+    20%, 35% {
+      transform: translateY(-110px);
+    }
+    40%, 55% {
+      transform: translateY(-220px);
+    }
+    60%, 75% {
+      transform: translateY(-330px);
+    }
+    80%, 95% {
+      transform: translateY(-440px);
+    }
+    100% {
+      transform: translateY(-550px);
+    }
+  }
+
+  .animate-scroll-step {
+    animation: scroll-step 20s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
+  @keyframes button-pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.03);
+    }
+  }
+
+  @keyframes glow-ring {
+    0% {
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.6),
+                  0 0 40px rgba(248, 113, 113, 0.4),
+                  inset 0 0 20px rgba(239, 68, 68, 0.2);
+    }
+    50% {
+      box-shadow: 0 0 40px rgba(239, 68, 68, 0.8),
+                  0 0 60px rgba(248, 113, 113, 0.6),
+                  0 0 80px rgba(239, 68, 68, 0.4),
+                  inset 0 0 30px rgba(239, 68, 68, 0.3);
+    }
+    100% {
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.6),
+                  0 0 40px rgba(248, 113, 113, 0.4),
+                  inset 0 0 20px rgba(239, 68, 68, 0.2);
+    }
+  }
+
+  @keyframes glow-ring-blue {
+    0% {
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.6),
+                  0 0 40px rgba(248, 113, 113, 0.4),
+                  inset 0 0 20px rgba(239, 68, 68, 0.2);
+    }
+    50% {
+      box-shadow: 0 0 40px rgba(239, 68, 68, 0.8),
+                  0 0 60px rgba(248, 113, 113, 0.6),
+                  0 0 80px rgba(239, 68, 68, 0.4),
+                  inset 0 0 30px rgba(239, 68, 68, 0.3);
+    }
+    100% {
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.6),
+                  0 0 40px rgba(248, 113, 113, 0.4),
+                  inset 0 0 20px rgba(239, 68, 68, 0.2);
+    }
+  }
+
+  @keyframes gradient-shift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  @keyframes shimmer-sweep {
+    0% {
+      left: -100%;
+      opacity: 0;
+    }
+    50% {
+      opacity: 0.8;
+    }
+    100% {
+      left: 100%;
+      opacity: 0;
+    }
+  }
+
+  @keyframes icon-bounce {
+    0%, 100% {
+      transform: translateY(0) scale(1);
+    }
+    50% {
+      transform: translateY(-3px) scale(1.1);
+    }
+  }
+
+  @keyframes shake-subtle {
+    0%, 100% {
+      transform: translateX(0);
+    }
+    25% {
+      transform: translateX(-2px);
+    }
+    75% {
+      transform: translateX(2px);
+    }
+  }
+
+  @keyframes glow-ring-red {
+    0% {
+      box-shadow: 0 0 20px rgba(220, 38, 38, 0.6),
+                  0 0 40px rgba(239, 68, 68, 0.4),
+                  inset 0 0 20px rgba(220, 38, 38, 0.2);
+    }
+    50% {
+      box-shadow: 0 0 40px rgba(220, 38, 38, 0.8),
+                  0 0 60px rgba(239, 68, 68, 0.6),
+                  0 0 80px rgba(220, 38, 38, 0.4),
+                  inset 0 0 30px rgba(220, 38, 38, 0.3);
+    }
+    100% {
+      box-shadow: 0 0 20px rgba(220, 38, 38, 0.6),
+                  0 0 40px rgba(239, 68, 68, 0.4),
+                  inset 0 0 20px rgba(220, 38, 38, 0.2);
+    }
+  }
+
+  @keyframes border-flow {
+    0% {
+      background-position: 0% 0%;
+    }
+    100% {
+      background-position: 200% 0%;
+    }
+  }
+
+  @keyframes gradient-shift-slow {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  @keyframes pulse-slow {
+    0%, 100% {
+      opacity: 0.3;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.5;
+      transform: scale(1.1);
+    }
+  }
+
+  @keyframes shimmer-horizontal {
+    0% {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    50% {
+      opacity: 0.8;
+    }
+    100% {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+
+  @keyframes wave-pattern {
+    0% {
+      transform: translateY(0) scale(1);
+    }
+    50% {
+      transform: translateY(-10px) scale(1.05);
+    }
+    100% {
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes spin-slow {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0) translateX(0);
+    }
+    25% {
+      transform: translateY(-10px) translateX(5px);
+    }
+    50% {
+      transform: translateY(-5px) translateX(-5px);
+    }
+    75% {
+      transform: translateY(-15px) translateX(3px);
+    }
+  }
+
+  .animate-button-pulse {
+    animation: button-pulse 2s ease-in-out infinite;
+  }
+
+  .animate-glow-ring {
+    animation: glow-ring 2s ease-in-out infinite;
+  }
+
+  .animate-gradient-shift {
+    animation: gradient-shift 3s ease infinite;
+    background-size: 200% 200%;
+  }
+
+  .animate-gradient-shift-slow {
+    animation: gradient-shift-slow 8s ease infinite;
+  }
+
+  .animate-icon-bounce {
+    animation: icon-bounce 1.5s ease-in-out infinite;
+  }
+
+  .animate-shake-subtle {
+    animation: shake-subtle 0.5s ease-in-out;
+  }
+
+  .animate-glow-ring-red {
+    animation: glow-ring-red 2s ease-in-out infinite;
+  }
+
+  .animate-glow-ring-blue {
+    animation: glow-ring-blue 2s ease-in-out infinite;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse-slow 6s ease-in-out infinite;
+  }
+
+  @keyframes icon-float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  @keyframes arrow-flow {
+    0%, 100% {
+      transform: translateX(0);
+      opacity: 0.7;
+    }
+    50% {
+      transform: translateX(6px);
+      opacity: 1;
+    }
+  }
+
+  @keyframes sparkle {
+    0%, 100% {
+      opacity: 0.3;
+      transform: scale(0.8) rotate(0deg);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.2) rotate(180deg);
+    }
+  }
+
+  @keyframes glow-pulse-ring {
+    0%, 100% {
+      opacity: 0.6;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .animate-icon-float {
+    animation: icon-float 3s ease-in-out infinite;
+  }
+
+  .animate-arrow-flow {
+    animation: arrow-flow 1.5s ease-in-out infinite;
+  }
+
+  .animate-sparkle {
+    animation: sparkle 2s ease-in-out infinite;
+  }
+
+  .animate-glow-pulse {
+    animation: glow-pulse-ring 2s ease-in-out infinite;
+  }
+
+  .animate-wave-pattern {
+    animation: wave-pattern 8s ease-in-out infinite;
+  }
+
+  .animate-spin-slow {
+    animation: spin-slow 20s linear infinite;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-button-pulse,
+    .animate-glow-ring,
+    .animate-glow-ring-blue,
+    .animate-gradient-shift,
+    .animate-gradient-shift-slow,
+    .animate-icon-bounce,
+    .animate-shake-subtle,
+    .animate-glow-ring-green,
+    .animate-pulse-slow,
+    .animate-icon-float,
+    .animate-arrow-flow,
+    .animate-sparkle,
+    .animate-glow-pulse,
+    .animate-wave-pattern,
+    .animate-spin-slow,
+    .animate-float {
+      animation: none;
+    }
+  }
+}
