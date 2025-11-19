@@ -17,6 +17,7 @@ import Press from './pages/Press';
 import SpecifiedCommercialTransactionAct from './pages/SpecifiedCommercialTransactionAct';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
+import Backtest from './pages/Backtest';
 import { initializeGoogleTracking } from './lib/googleTracking';
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
           <Route path="/careers" element={<Careers />} />
           <Route path="/press" element={<Press />} />
           <Route path="/specified-commercial-transaction-act" element={<SpecifiedCommercialTransactionAct />} />
+          <Route path="/backtest" element={<Backtest />} />
 
           {/* Admin Routes */}
           <Route path="/adsadmin" element={<AdminLogin />} />
