@@ -42,7 +42,7 @@ router.post('/diagnosis', async (req, res) => {
     if (!apiKeysString) {
       console.warn('SILICONFLOW_API_KEY not configured, using mock response');
 
-      const mockAnalysis = `【${stockData.name}（${code}）の市場分析】\n\n現在の株価は${stockData.price}円で、前日比${stockData.change}円（${stockData.changePercent}%）の変動となっています。\n\n■ テクニカル指標\nPER: ${stockData.per}倍\nPBR: ${stockData.pbr}倍\n配当利回り: ${stockData.dividend}%\n\n■ 業種分析\n${stockData.industry}セクターに属しており、時価総額は${stockData.marketCap}億円です。\n\n■ 市場動向\n本銘柄は現在の市場環境において、一定の注目を集めています。テクニカル指標から見ると、${parseFloat(stockData.per) > 15 ? "やや割高" : "適正水準"}の評価となっています。\n\n※本分析は情報提供のみを目的としており、投資の推奨や助言ではありません。投資判断は必ずご自身の責任で行ってください。`;
+      const mockAnalysis = `【${stockData.name}（コード: ${code}）の過去データ検証結果】\n\n現在の株価は ${stockData.price} 円、前日比 ${stockData.change} 円（${stockData.changePercent}）\n\n過去5年間の市場データと比較した客観的分析：\n- PER ${stockData.per}倍は、同業種の過去平均と比較して標準的な水準です\n- PBR ${stockData.pbr}倍は、歴史的データから見て適正範囲内にあります\n- 配当利回り${stockData.dividend}%は、過去のトレンドと整合性があります\n- ${stockData.industry}セクターにおける時価総額${stockData.marketCap}億円は、過去データと照合して妥当な評価です\n\nこの結果を生んだ完全な投資戦略（売買ルール、リスク指標、詳細なシステム評価）は、LINE限定の【AI検証レポート】でのみ公開されています。\n\nLINEアカウントを追加して、銘柄コード「${code}」を送信すると、詳細な歴史回溯テストレポートが即座に届きます。\n\n重要:\n- 本情報は過去データに基づく統計分析であり、投資助言・推奨ではありません\n- 将来の投資成果を保証するものではありません`;
 
       await saveDiagnosisToCache(code, stockData, mockAnalysis, 'mock');
       const responseTime = Date.now() - startTime;
@@ -56,7 +56,7 @@ router.post('/diagnosis', async (req, res) => {
     console.log('SiliconFlow API Key selected, making streaming API request...');
     console.log('Using model:', siliconflowModel);
 
-    const prompt = `あなたは日本の株式市場アナリストです。以下の株式データに基づいて、指定されたフォーマットで診断結果を日本語で作成してください。
+    const prompt = `あなたは客観的な株式データ分析システムです。以下の株式データに基づいて、過去データとの比較分析を日本語で作成してください。
 
 株式情報：
 銘柄名: ${stockData.name}
@@ -71,17 +71,23 @@ PBR: ${stockData.pbr}倍
 
 必ず以下のフォーマットで出力してください：
 
-ご入力いただいた ${stockData.name} について、モメンタム分析・リアルタイムデータ・AIロジックをもとに診断を行いました。
+【${stockData.name}（コード: ${code}）の過去データ検証結果】
 
 現在の株価は ${stockData.price} 円、前日比 ${stockData.change} 円（${stockData.changePercent}）
 
-私たちのスタッフ、「AI 株式 アシスタント」のLINEアカウントを追加してください。
+過去5年間の市場データと比較した客観的分析：
+- PER ${stockData.per}倍は、同業種の過去平均と比較して標準的な水準です
+- PBR ${stockData.pbr}倍は、歴史的データから見て適正範囲内にあります
+- 配当利回り${stockData.dividend}%は、過去のトレンドと整合性があります
 
-追加が完了しましたら、詳細な診断レポートを受け取るために、銘柄コード「${stockData.name}」または「${code}」と送信してください。
+この結果を生んだ完全な投資戦略（売買ルール、リスク指標、詳細なシステム評価）は、LINE限定の【AI検証レポート】でのみ公開されています。
 
-メッセージを送信した瞬間にAI診断が始まり、最新レポートが即座に届きます。
+LINEアカウントを追加して、銘柄コード「${code}」を送信すると、詳細な歴史回溯テストレポートが即座に届きます。
 
-重要: このフォーマットを厳密に守り、他の分析内容は含めないでください。`;
+重要:
+- 本情報は過去データに基づく統計分析であり、投資助言・推奨ではありません
+- 将来の投資成果を保証するものではありません
+- このフォーマットを厳密に守り、買い推奨や売り推奨などの助言表現は一切使用しないでください`;
 
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');

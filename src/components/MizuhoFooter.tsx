@@ -91,11 +91,41 @@ export default function MizuhoFooter() {
           </div>
         </div>
 
-        <div className="border-t border-white/30 pt-8 text-center text-xs text-white/70 leading-relaxed">
-          <p className="mb-2">【重要】本サービスで提供される情報は教育・情報提供のみを目的としており、特定の金融商品の売買や投資勧誘を行うものではありません。</p>
-          <p className="mb-2">株式投資には価格変動リスクがあり、投資元本を割り込む可能性があります。</p>
-          <p className="mb-2">投資に関する最終決定は、利用者ご自身の責任と判断で行ってください。</p>
-          <p>当サービス提供者は金融商品取引業者ではなく、個別の投資助言を行うことはできません。投資を行う際は、必ず金融商品取引業者または専門家にご相談ください。</p>
+        <div className="border-t border-white/30 pt-8 space-y-6">
+          <div className="bg-amber-900/30 border-2 border-amber-500/50 rounded-xl p-6">
+            <h3 className="text-base font-black text-amber-300 mb-3 text-center">
+              【重要な法的免責事項】
+            </h3>
+            <div className="text-sm text-white/90 leading-relaxed space-y-2">
+              <p className="font-semibold">
+                <span className="text-amber-300">■ サービスの性質：</span>
+                本サービスは「過去の市場データに基づく統計分析ツール」であり、情報提供のみを目的としています。特定の金融商品の売買推奨・投資助言を行うものではありません。
+              </p>
+              <p className="font-semibold">
+                <span className="text-amber-300">■ 投資判断の責任：</span>
+                提供される情報は過去のデータに基づくものであり、将来の投資成果を保証するものではありません。投資に関する最終決定は、利用者ご自身の責任と判断で行ってください。
+              </p>
+              <p className="font-semibold">
+                <span className="text-amber-300">■ リスク認識：</span>
+                株式投資には価格変動リスクがあり、投資元本を割り込む可能性があります。投資を行う際は、十分なリスク理解の上で実施してください。
+              </p>
+              <p className="font-semibold">
+                <span className="text-amber-300">■ 事業者情報：</span>
+                当サービス提供者は金融商品取引業者ではありません。個別の投資助言を行うことはできません。投資を行う際は、必ず金融商品取引業者または専門家にご相談ください。
+              </p>
+            </div>
+          </div>
+
+          <div className="text-center text-xs text-white/70 leading-relaxed">
+            <p className="font-semibold mb-2">運営: tokyostocks</p>
+            <p className="mb-1">データ出典: 公開市場情報（準リアルタイム）</p>
+            <p className="mb-1">本サービスは情報提供のみを目的とし、金融商品取引業に該当する行為は行いません。</p>
+            <p className="text-xs text-white/50 mt-3">
+              法律に関するご質問は、<Link to="/terms" className="underline hover:text-blue-300">利用規約</Link>、
+              <Link to="/privacy" className="underline hover:text-blue-300 ml-1">プライバシーポリシー</Link>、
+              <Link to="/disclaimer" className="underline hover:text-blue-300 ml-1">免責事項</Link>をご確認ください。
+            </p>
+          </div>
         </div>
       </div>
     </footer>

@@ -334,7 +334,7 @@ export default function NewHome() {
 
   return (
     <div className="min-h-screen relative" style={{ margin: 0, padding: 0 }}>
-      <NewHeader />
+      <NewHeader stockCode={stockCode} stockName={stockData?.info.name} />
 
       <div style={{ margin: 0, padding: 0 }}>
         {loading && (
@@ -346,7 +346,10 @@ export default function NewHome() {
 
         {diagnosisState === 'initial' && (
           <>
-            <StockAnalysisTitle stockName={stockData?.info.name || 'データ取得中'} />
+            <StockAnalysisTitle
+              stockName={stockData?.info.name || 'データ取得中'}
+              stockCode={stockCode}
+            />
 
             <div className="relative max-w-xl mx-auto px-4 py-8 md:py-12">
               <RotatingAIBadge />
@@ -360,14 +363,14 @@ export default function NewHome() {
               </div>
 
               <div className="mt-8 relative">
-                <div className="flex items-center justify-center gap-3 mb-2">
+                <div className="flex items-center justify-center gap-3 mb-3">
                   <img
                     src="/images/left.png"
                     alt=""
                     className="w-6 h-6 md:w-8 md:h-8 object-contain"
                   />
                   <h2 className="text-xl md:text-2xl font-bold text-white text-center font-artistic">
-                    株式データ履歴
+                    歴史データ表示
                   </h2>
                   <img
                     src="/images/right.png"
@@ -375,14 +378,14 @@ export default function NewHome() {
                     className="w-6 h-6 md:w-8 md:h-8 object-contain"
                   />
                 </div>
-                <p className="text-xs md:text-sm text-white font-bold text-center px-4 mb-2">
-                  過去の株式市場データの参考表示
+                <p className="text-xs md:text-sm text-blue-200 font-semibold text-center px-4 mb-2">
+                  過去の市場データに基づく客観的情報
                 </p>
                 <p className="text-xs text-amber-300 font-bold text-center px-4 mb-6">
-                  ※投資判断はご自身の責任で行ってください
+                  ※本情報は統計データであり、投資助言・推奨ではありません
                 </p>
                 <div className="mb-6 flex justify-center">
-                  <div className="relative inline-block">
+                  <div className="relative inline-block w-full max-w-md px-4">
                     <div
                       className="absolute inset-0 rounded-xl translate-y-1.5"
                       style={{
@@ -392,13 +395,13 @@ export default function NewHome() {
                     ></div>
                     <button
                       onClick={runDiagnosis}
-                      className="relative font-bold py-3 px-10 rounded-xl text-white transition-all duration-200 hover:translate-y-0.5 active:translate-y-1"
+                      className="relative w-full font-bold py-4 px-8 rounded-xl text-white transition-all duration-200 hover:translate-y-0.5 active:translate-y-1 text-base"
                       style={{
                         background: 'linear-gradient(135deg, #4A90E2 0%, #357ABD 50%, #4A90E2 100%)',
                         zIndex: 1
                       }}
                     >
-                      参考情報を表示
+                      分析レポートを即時生成する
                     </button>
                   </div>
                 </div>

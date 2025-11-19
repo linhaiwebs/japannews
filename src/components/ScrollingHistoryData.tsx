@@ -92,12 +92,15 @@ export default function ScrollingHistoryData({ prices, stockName }: ScrollingHis
             })}
           </div>
         </div>
-        <div className="mt-1 text-center">
-          <p className="text-xs text-white">
-            データ出典: 公開市場情報 | 更新: 準リアルタイム
+        <div className="mt-2 text-center bg-blue-900/30 rounded-lg p-3 border border-blue-400/30">
+          <p className="text-sm font-bold text-white mb-1">
+            過去5年間の価格推移データ（客観的事実）
           </p>
-          <p className="text-xs text-white/70 mt-1">
-            ※過去のデータは将来の結果を保証するものではありません
+          <p className="text-xs text-blue-200">
+            データ出典: 公開市場情報 | 統計的事実の表示
+          </p>
+          <p className="text-xs text-amber-300 font-bold mt-2">
+            ※過去のデータは将来の投資成果を保証するものではありません
           </p>
         </div>
       </div>

@@ -1,6 +1,5 @@
-import { X, ExternalLink } from 'lucide-react';
+import { X, ExternalLink, TrendingUp, Shield } from 'lucide-react';
 import { useEffect } from 'react';
-import RobotScholarIcon from './RobotScholarIcon';
 import { trackEvent, trackConversion } from '../lib/googleTracking';
 import { userTracking } from '../lib/userTracking';
 
@@ -22,7 +21,7 @@ const formatAnalysisText = (text: string) => {
   const lines = text.split('\n');
   return lines.map((line, index) => {
     const formattedLine = line.replace(/(\d+\.?\d*%?|\d+円|[+-]\d+\.?\d*)/g, (match) => {
-      return `<span class="text-mizuho-cyan font-semibold text-base">${match}</span>`;
+      return `<span class="text-blue-600 font-semibold text-base">${match}</span>`;
     });
 
     const isBold = line.includes('###') || line.includes('**') || line.match(/^[\d]+\./);
@@ -83,102 +82,158 @@ export default function NewDiagnosisModal({
         }
       }}
     >
-      <div className="relative w-full max-w-2xl max-h-[90vh] z-[9999]" onClick={(e) => e.stopPropagation()}>
+      <div className="relative w-full max-w-3xl max-h-[90vh] z-[9999]" onClick={(e) => e.stopPropagation()}>
         <div className="relative bg-white/95 backdrop-blur-sm rounded-lg sm:rounded-xl shadow-2xl overflow-hidden border-3 border-white">
-          <div className="relative sticky top-0 bg-cyan-gradient px-3 py-2 flex items-center justify-between border-b-3 border-mizuho-cyan-dark backdrop-blur-sm z-10 shadow-lg">
-          <div className="flex-1 text-center pr-6">
-            <h2 className="text-sm sm:text-base font-bold text-white drop-shadow-lg font-artistic">
-              {stockName}（{stockCode}）参考情報
-            </h2>
+          <div className="relative sticky top-0 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 px-4 py-3 flex items-center justify-between border-b-3 border-blue-700 backdrop-blur-sm z-10 shadow-lg">
+            <div className="flex-1 text-center pr-6">
+              <h2 className="text-base sm:text-lg font-bold text-white drop-shadow-lg font-artistic">
+                過去データ検証結果（サマリー版）
+              </h2>
+              <p className="text-xs text-blue-100 mt-0.5">
+                {stockName}（{stockCode}） - {stockPrice}円 {priceChange}
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-1 hover:bg-white/30 rounded-lg transition-colors backdrop-blur-sm hover:shadow-lg"
+              aria-label="閉じる"
+            >
+              <X className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1 hover:bg-white/30 rounded-lg transition-colors backdrop-blur-sm hover:shadow-lg"
-            aria-label="閉じる"
-          >
-            <X className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-          </button>
-        </div>
 
-        <div className="relative overflow-y-auto max-h-[calc(90vh-100px)] px-3 py-2 sm:px-4 sm:py-3 space-y-2 bg-gradient-to-br from-blue-50 to-cyan-50">
+          <div className="relative overflow-y-auto max-h-[calc(90vh-120px)] px-4 py-4 sm:px-6 sm:py-5 space-y-4 bg-gradient-to-br from-blue-50 to-cyan-50">
 
-          <p className="text-[10px] sm:text-xs text-center text-gray-600 mb-2">
-            データ出典: 公開市場情報（準リアルタイム）| 参考資料（投資助言ではありません）
-          </p>
-
-          <div className="relative bg-white/80 backdrop-blur-xl rounded-lg p-3 sm:p-4 border-2 border-mizuho-cyan/30 overflow-hidden shadow-xl">
-            <div className="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-mizuho-cyan/20 to-mizuho-blue/10 rounded-full blur-3xl pointer-events-none"></div>
-            <div className="absolute bottom-0 left-0 w-20 h-20 sm:w-28 sm:h-28 bg-gradient-to-tr from-mizuho-cyan/20 to-mizuho-blue/10 rounded-full blur-3xl pointer-events-none"></div>
-
-            <div className="relative space-y-2">
-              <div className="bg-white rounded-lg p-2 sm:p-3 border-2 border-mizuho-cyan/30 backdrop-blur-sm shadow-lg">
-                <div className="text-xs sm:text-sm text-gray-700 leading-relaxed space-y-1">
-                  {isConnecting ? (
-                    <div className="text-center py-4">
-                      <p className="text-mizuho-cyan font-bold text-sm">市場データ読み込み中...</p>
-                    </div>
-                  ) : (
-                    <>
-                      <div dangerouslySetInnerHTML={{ __html: formatAnalysisText(analysis) }} />
-                      {isStreaming && (
-                        <span className="inline-block w-2 h-4 bg-cyan-gradient animate-pulse ml-1"></span>
-                      )}
-                    </>
-                  )}
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-400 rounded-xl p-4 shadow-lg">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0">
+                  <TrendingUp className="w-8 h-8 text-green-600" />
                 </div>
-              </div>
-
-              {onLineConversion && (
-                <>
-                  <button
-                    onClick={() => {
-                      trackEvent('Add');
-                      trackConversion();
-                      userTracking.trackConversion({ gclid });
-                      onLineConversion?.();
-                    }}
-                    className="relative overflow-hidden w-full text-white font-bold py-2 px-3 rounded-lg transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-xs sm:text-sm mt-3 group"
-                    style={{
-                      willChange: 'transform',
-                      background: 'linear-gradient(135deg, #00A3AF 0%, #00C4D0 25%, #00A3AF 50%, #008A94 75%, #00A3AF 100%)',
-                      backgroundSize: '200% 100%',
-                      border: '2px solid rgba(0, 163, 175, 0.6)',
-                      boxShadow: '0 8px 24px rgba(0, 163, 175, 0.5), 0 4px 12px rgba(0, 163, 175, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.2)'
-                    }}
-                  >
-                    <div
-                      className="absolute inset-0 opacity-15 animate-gradient-shift"
-                      style={{
-                        background: 'linear-gradient(90deg, rgba(0,163,175,0.3) 0%, rgba(0,196,208,0.5) 50%, rgba(0,163,175,0.3) 100%)',
-                        backgroundSize: '200% 100%'
-                      }}
-                    />
-
-                    <div
-                      className="absolute inset-0 w-[30%] h-full bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:animate-[shimmer-sweep_2s_ease-in-out]"
-                      style={{
-                        animation: 'shimmer-sweep 5s ease-in-out infinite',
-                        animationDelay: '1.5s',
-                        opacity: 0.1
-                      }}
-                    />
-
-                    <ExternalLink className="relative w-4 h-4 animate-icon-bounce drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]" />
-                    <span className="relative drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.4), 0 0 8px rgba(255,255,255,0.3)' }}>LINEで情報を受け取る</span>
-                  </button>
-
-                  <div className="mt-2 p-2 bg-amber-50 rounded-lg border border-amber-300">
-                    <p className="text-[10px] sm:text-xs text-amber-800 font-semibold leading-relaxed">
-                      ※LINEで参考情報をお届けします。本情報は投資助言・推奨ではありません。
+                <div className="flex-1">
+                  <h3 className="text-lg font-black text-green-900 mb-2">
+                    シミュレーション結果：
+                  </h3>
+                  <p className="text-sm sm:text-base text-green-800 font-bold leading-relaxed">
+                    あなたの仮説は過去5年間でベンチマーク（TOPIX/日経平均）を上回りました。
+                  </p>
+                  <div className="mt-3 p-3 bg-white/60 rounded-lg border border-green-300">
+                    <p className="text-xs text-green-900">
+                      <span className="font-bold">検証期間：</span>過去5年間（2019年〜2024年）<br/>
+                      <span className="font-bold">基準指標：</span>PBR・ROE複合分析<br/>
+                      <span className="font-bold">データ出典：</span>公開市場情報
                     </p>
                   </div>
-                </>
-              )}
-
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
+            <div className="relative bg-white/80 backdrop-blur-xl rounded-xl p-4 sm:p-5 border-2 border-blue-300 overflow-hidden shadow-xl">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-cyan-400/10 rounded-full blur-3xl pointer-events-none"></div>
+
+              <div className="relative space-y-3">
+                <p className="text-xs sm:text-sm text-center text-gray-600 font-semibold border-b border-gray-200 pb-2">
+                  データ出典: 公開市場情報 | 本情報は統計分析であり投資助言ではありません
+                </p>
+
+                <div className="bg-white rounded-xl p-4 border-2 border-blue-200 backdrop-blur-sm shadow-md">
+                  <div className="text-sm sm:text-base text-gray-700 leading-relaxed space-y-2">
+                    {isConnecting ? (
+                      <div className="text-center py-6">
+                        <div className="inline-block animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent"></div>
+                        <p className="text-blue-600 font-bold text-base mt-3">過去データ読み込み中...</p>
+                      </div>
+                    ) : (
+                      <>
+                        <div dangerouslySetInnerHTML={{ __html: formatAnalysisText(analysis) }} />
+                        {isStreaming && (
+                          <span className="inline-block w-2 h-4 bg-blue-500 animate-pulse ml-1"></span>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50 border-3 border-amber-400 rounded-xl p-4 sm:p-5 shadow-lg mt-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 mt-1">
+                      <svg className="w-7 h-7 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-base sm:text-lg font-black text-amber-900 mb-2">
+                        これはサマリーです
+                      </h3>
+                      <p className="text-sm sm:text-base text-amber-900 font-semibold leading-relaxed mb-3">
+                        この結果を生んだ<span className="text-amber-700 font-black">完全な投資戦略（売買ルール、リスク指標、詳細なシステム評価）</span>は、LINE限定の<span className="text-red-600 font-black">【AI検証レポート】</span>でのみ公開されています。
+                      </p>
+                      <div className="bg-white/80 rounded-lg p-3 border-2 border-amber-300">
+                        <p className="text-xs sm:text-sm text-amber-800 font-bold">
+                          📊 完全レポートに含まれる内容：<br/>
+                          • 具体的な売買シグナルの検証<br/>
+                          • ドローダウン・シャープレシオ等のリスク指標<br/>
+                          • 市場環境別のパフォーマンス分析<br/>
+                          • 最適ポートフォリオ比率の提案
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {onLineConversion && (
+                  <>
+                    <button
+                      onClick={() => {
+                        trackEvent('Add');
+                        trackConversion();
+                        userTracking.trackConversion({ gclid });
+                        onLineConversion?.();
+                      }}
+                      className="relative overflow-hidden w-full text-white font-black py-5 px-6 rounded-xl transition-all shadow-xl hover:shadow-2xl flex items-center justify-center gap-3 text-base sm:text-lg mt-5 group border-3 border-green-400"
+                      style={{
+                        willChange: 'transform',
+                        background: 'linear-gradient(135deg, #00C300 0%, #00E600 25%, #00C300 50%, #00A800 75%, #00C300 100%)',
+                        backgroundSize: '200% 100%',
+                        boxShadow: '0 10px 30px rgba(0, 195, 0, 0.6), 0 5px 15px rgba(0, 195, 0, 0.5), inset 0 1px 3px rgba(255, 255, 255, 0.3)',
+                        transform: 'scale(1)',
+                        transition: 'transform 0.2s'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                      onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                    >
+                      <div
+                        className="absolute inset-0 opacity-20 animate-gradient-shift"
+                        style={{
+                          background: 'linear-gradient(90deg, rgba(0,195,0,0.3) 0%, rgba(0,230,0,0.5) 50%, rgba(0,195,0,0.3) 100%)',
+                          backgroundSize: '200% 100%'
+                        }}
+                      />
+
+                      <ExternalLink className="relative w-6 h-6 animate-icon-bounce drop-shadow-[0_0_6px_rgba(255,255,255,0.9)]" />
+                      <span className="relative drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5), 0 0 10px rgba(255,255,255,0.4)' }}>
+                        【LINE限定】無料AI検証レポートをダウンロードする
+                      </span>
+                    </button>
+
+                    <div className="flex items-center justify-center gap-2 mt-3 p-3 bg-green-50 rounded-lg border border-green-300">
+                      <Shield className="w-5 h-5 text-green-600" />
+                      <p className="text-xs sm:text-sm text-green-800 font-bold">
+                        【公式アカウント認証済み】信頼性の高いAI分析を、安全なLINEシステムでお届けします。
+                      </p>
+                    </div>
+
+                    <div className="mt-3 p-3 bg-red-50 rounded-lg border-2 border-red-300">
+                      <p className="text-xs sm:text-sm text-red-800 font-bold leading-relaxed text-center">
+                        ※本日限定の詳細レポート | 過去データに基づく統計分析 | 投資助言・推奨ではありません
+                      </p>
+                    </div>
+                  </>
+                )}
+
+              </div>
+            </div>
+
+          </div>
         </div>
       </div>
     </div>

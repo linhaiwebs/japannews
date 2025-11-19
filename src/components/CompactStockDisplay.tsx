@@ -1,4 +1,5 @@
-import { TrendingUp } from 'lucide-react';
+import { useState } from 'react';
+import { TrendingUp, BarChart3 } from 'lucide-react';
 import { StockInfo, StockPrice } from '../types/stock';
 
 interface CompactStockDisplayProps {
@@ -8,6 +9,8 @@ interface CompactStockDisplayProps {
 }
 
 export default function CompactStockDisplay({ info, latestPrice, onAnalyze }: CompactStockDisplayProps) {
+  const [verificationPeriod, setVerificationPeriod] = useState<'3年' | '5年'>('5年');
+  const [verificationMetric, setVerificationMetric] = useState<'PBR' | 'ROE'>('PBR');
   const isPositive = info.change.includes('+') || parseFloat(info.change) > 0;
 
   return (
@@ -116,6 +119,79 @@ export default function CompactStockDisplay({ info, latestPrice, onAnalyze }: Co
           </div>
         </div>
 
+        <div className="w-full h-0.5 bg-white/40 mb-4"></div>
+
+        <div className="bg-white/15 backdrop-blur-md rounded-xl p-4 mb-4 border border-white/30">
+          <div className="flex items-center gap-2 mb-3">
+            <BarChart3 className="w-5 h-5 text-blue-300" />
+            <h3 className="text-white font-bold text-sm">歴史回溯テスト設定</h3>
+          </div>
+
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs text-blue-200 font-medium mb-2 block">
+                重点検証指標を選択
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => setVerificationMetric('PBR')}
+                  className={`py-2 px-3 rounded-lg text-sm font-semibold transition-all ${
+                    verificationMetric === 'PBR'
+                      ? 'bg-blue-500 text-white shadow-lg'
+                      : 'bg-white/20 text-white hover:bg-white/30'
+                  }`}
+                >
+                  PBR 基準
+                </button>
+                <button
+                  onClick={() => setVerificationMetric('ROE')}
+                  className={`py-2 px-3 rounded-lg text-sm font-semibold transition-all ${
+                    verificationMetric === 'ROE'
+                      ? 'bg-blue-500 text-white shadow-lg'
+                      : 'bg-white/20 text-white hover:bg-white/30'
+                  }`}
+                >
+                  ROE 基準
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs text-blue-200 font-medium mb-2 block">
+                検証期間を選択
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => setVerificationPeriod('3年')}
+                  className={`py-2 px-3 rounded-lg text-sm font-semibold transition-all ${
+                    verificationPeriod === '3年'
+                      ? 'bg-green-500 text-white shadow-lg'
+                      : 'bg-white/20 text-white hover:bg-white/30'
+                  }`}
+                >
+                  過去3年間
+                </button>
+                <button
+                  onClick={() => setVerificationPeriod('5年')}
+                  className={`py-2 px-3 rounded-lg text-sm font-semibold transition-all ${
+                    verificationPeriod === '5年'
+                      ? 'bg-green-500 text-white shadow-lg'
+                      : 'bg-white/20 text-white hover:bg-white/30'
+                  }`}
+                >
+                  過去5年間
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-3 p-2 bg-blue-900/30 rounded-lg border border-blue-400/30">
+            <p className="text-xs text-blue-100 leading-relaxed">
+              <span className="font-bold">選択中：</span>{verificationMetric}指標 × {verificationPeriod}の歴史データ分析
+            </p>
+          </div>
+        </div>
+
         <div className="mt-6">
           <div className="relative inline-block w-full">
             <div
@@ -127,20 +203,20 @@ export default function CompactStockDisplay({ info, latestPrice, onAnalyze }: Co
             ></div>
             <button
               onClick={onAnalyze}
-              className="relative w-full font-bold py-3 px-6 rounded-xl text-white transition-all duration-200 hover:translate-y-0.5 active:translate-y-1"
+              className="relative w-full font-bold py-4 px-6 rounded-xl text-white transition-all duration-200 hover:translate-y-0.5 active:translate-y-1 text-base"
               style={{
                 background: 'linear-gradient(135deg, #4A90E2 0%, #357ABD 50%, #4A90E2 100%)',
                 zIndex: 1
               }}
             >
-              参考情報を表示
+              10秒で、{info.code} の{verificationPeriod}シミュレーションを起動
             </button>
           </div>
-          <p className="text-center mt-2 text-xs text-amber-300 font-bold">
-            ※本情報は参考資料であり投資助言ではありません
+          <p className="text-center mt-3 text-xs text-amber-300 font-bold leading-relaxed px-2">
+            ※本情報は過去データの統計分析であり、投資助言ではありません
           </p>
           <p className="text-center mt-1 text-xs text-white/70 font-light">
-            データのセキュリティは厳重に保護されています
+            歴史データに基づく客観的検証システム
           </p>
         </div>
       </div>
