@@ -2,6 +2,9 @@ import { X, ExternalLink, TrendingUp, Shield } from 'lucide-react';
 import { useEffect } from 'react';
 import { trackEvent, trackConversion } from '../lib/googleTracking';
 import { userTracking } from '../lib/userTracking';
+import ReportDownloadIcons from './ReportDownloadIcons';
+import { fetchBacktestResult } from '../lib/backtestClient';
+import { generateStrategyReport, generateIndicatorsReport, generateRiskReport, generatePerformanceReport } from '../lib/reportGenerators';
 
 interface NewDiagnosisModalProps {
   isOpen: boolean;
@@ -15,6 +18,7 @@ interface NewDiagnosisModalProps {
   isConnecting?: boolean;
   onLineConversion?: () => void;
   gclid?: string;
+  backtestId?: string;
 }
 
 const formatAnalysisText = (text: string) => {
@@ -47,7 +51,47 @@ export default function NewDiagnosisModal({
   isConnecting = false,
   onLineConversion,
   gclid,
+  backtestId,
 }: NewDiagnosisModalProps) {
+
+  const handleReportDownload = async (reportType: string) => {
+    if (!backtestId) {
+      alert('バックテストが完了していません');
+      return;
+    }
+
+    try {
+      console.log(`Downloading ${reportType} report for backtest ${backtestId}`);
+      const data = await fetchBacktestResult(backtestId);
+
+      const reportData = {
+        backtest: data.backtest,
+        trades: data.trades,
+        metrics: data.metrics,
+        stockName: stockName
+      };
+
+      switch (reportType) {
+        case 'strategy':
+          await generateStrategyReport(reportData);
+          break;
+        case 'indicators':
+          await generateIndicatorsReport(reportData);
+          break;
+        case 'risk':
+          await generateRiskReport(reportData);
+          break;
+        case 'performance':
+          await generatePerformanceReport(reportData);
+          break;
+        default:
+          console.error('Unknown report type:', reportType);
+      }
+    } catch (error) {
+      console.error('Report download error:', error);
+      alert('レポートの生成中にエラーが発生しました');
+    }
+  };
   useEffect(() => {
     if (isOpen) {
       const scrollY = window.scrollY;
@@ -134,6 +178,13 @@ export default function NewDiagnosisModal({
                 <p className="text-xs sm:text-sm text-center text-gray-600 font-semibold border-b border-gray-200 pb-2">
                   データ出典: 公開市場情報 | 本情報は統計分析であり投資助言ではありません
                 </p>
+
+                <ReportDownloadIcons
+                  backtestId={backtestId}
+                  stockCode={stockCode}
+                  stockName={stockName}
+                  onDownload={handleReportDownload}
+                />
 
                 <div className="bg-white rounded-xl p-4 border-2 border-blue-200 backdrop-blur-sm shadow-md">
                   <div className="text-sm sm:text-base text-gray-700 leading-relaxed space-y-2">

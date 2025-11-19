@@ -9,6 +9,7 @@ import adminRouter from './routes/admin.js';
 import trackingRouter from './routes/tracking.js';
 import lineRedirectRouter from './routes/lineRedirect.js';
 import googleTrackingRouter from './routes/googleTracking.js';
+import backtestRouter from './routes/backtest.js';
 import { initializeDatabase, createInitialAdminUser, migrateLineRedirectLinks } from './database/schema.js';
 import { cleanExpiredCache } from './utils/cache.js';
 
@@ -76,6 +77,7 @@ app.use('/api/admin', adminRouter);
 app.use('/api/tracking', trackingRouter);
 app.use('/api/line-redirects', lineRedirectRouter);
 app.use('/api/google-tracking', googleTrackingRouter);
+app.use('/api/backtest', backtestRouter);
 
 app.get('/health', (req, res) => {
   res.json({

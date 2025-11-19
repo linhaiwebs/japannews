@@ -12,6 +12,7 @@ import { useUrlParams } from '../hooks/useUrlParams';
 import { apiClient } from '../lib/apiClient';
 import { userTracking } from '../lib/userTracking';
 import { trackEvent } from '../lib/googleTracking';
+import { executeBacktest, fetchStrategies, formatBacktestSummary, type BacktestResults } from '../lib/backtestClient';
 
 const getDefaultStockData = (code: string): StockData => ({
   info: {
@@ -59,6 +60,8 @@ export default function NewHome() {
   const [diagnosisStartTime, setDiagnosisStartTime] = useState<number>(0);
   const [loadingProgress, setLoadingProgress] = useState<number>(0);
   const [showLoadingOverlay, setShowLoadingOverlay] = useState<boolean>(false);
+  const [backtestId, setBacktestId] = useState<string>('');
+  const [backtestResults, setBacktestResults] = useState<BacktestResults | null>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -135,8 +138,9 @@ export default function NewHome() {
     setAnalysisResult('');
     setLoadingProgress(0);
     setShowLoadingOverlay(true);
+    setBacktestId('');
+    setBacktestResults(null);
 
-    // 清除之前的interval（如果存在）
     if (progressIntervalRef.current) {
       clearInterval(progressIntervalRef.current);
     }
@@ -153,136 +157,53 @@ export default function NewHome() {
     }, 100);
 
     try {
-      const apiUrl = `${import.meta.env.VITE_API_URL || ''}/api/gemini/diagnosis`;
+      console.log('Fetching available strategies...');
+      const strategies = await fetchStrategies();
 
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 50000);
+      if (!strategies || strategies.length === 0) {
+        throw new Error('利用可能な戦略が見つかりません');
+      }
 
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          code: stockCode,
-          stockData: {
-            name: stockData.info.name,
-            price: stockData.info.price,
-            change: stockData.info.change,
-            changePercent: stockData.info.changePercent,
-            per: stockData.info.per,
-            pbr: stockData.info.pbr,
-            dividend: stockData.info.dividend,
-            industry: stockData.info.industry,
-            marketCap: stockData.info.marketCap,
-          },
-        }),
-        signal: controller.signal,
+      const defaultStrategy = strategies.find(s => s.strategy_name === 'SMA Golden Cross') || strategies[0];
+
+      console.log(`Executing backtest with strategy: ${defaultStrategy.strategy_name}`);
+
+      const backtestResult = await executeBacktest({
+        stockCode: stockCode,
+        strategyId: defaultStrategy.id,
+        strategyParams: defaultStrategy.default_params
       });
 
-      clearTimeout(timeoutId);
       if (progressIntervalRef.current) {
         clearInterval(progressIntervalRef.current);
         progressIntervalRef.current = null;
       }
 
-      if (!response.ok) {
-        throw new Error('情報の取得に失敗しました');
-      }
+      setLoadingProgress(100);
 
-      setDiagnosisState('processing');
-
-      const contentType = response.headers.get('content-type');
-
-      if (contentType?.includes('text/event-stream')) {
-        const reader = response.body?.getReader();
-        const decoder = new TextDecoder();
-        let fullAnalysis = '';
-        let firstChunk = true;
-
-        if (!reader) {
-          throw new Error('ストリーム読み取りに失敗しました');
-        }
-
-        while (true) {
-          const { done, value } = await reader.read();
-
-          if (done) {
-            break;
-          }
-
-          const text = decoder.decode(value, { stream: true });
-          const lines = text.split('\n').filter(line => line.trim() !== '');
-
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              const data = line.slice(6);
-
-              try {
-                const parsed = JSON.parse(data);
-
-                if (parsed.error) {
-                  throw new Error(parsed.error);
-                }
-
-                if (parsed.content) {
-                  fullAnalysis += parsed.content;
-
-                  if (firstChunk && fullAnalysis.trim().length > 0) {
-                    setLoadingProgress(100);
-                    setTimeout(() => {
-                      setShowLoadingOverlay(false);
-                      setDiagnosisState('streaming');
-                    }, 600);
-                    firstChunk = false;
-                  }
-
-                  setAnalysisResult(fullAnalysis);
-                }
-
-                if (parsed.done) {
-                  setDiagnosisState('results');
-
-                  const durationMs = Date.now() - diagnosisStartTime;
-                  await userTracking.trackDiagnosisClick({
-                    stockCode: stockCode,
-                    stockName: stockData.info.name,
-                    durationMs: durationMs
-                  });
-                }
-              } catch (parseError) {
-                console.error('Error parsing SSE data:', parseError);
-              }
-            }
-          }
-        }
-      } else {
-        const result = await response.json();
-
-        if (!result.analysis || result.analysis.trim() === '') {
-          throw new Error('参考情報が取得できませんでした');
-        }
-
-        setAnalysisResult(result.analysis);
+      setTimeout(() => {
+        setShowLoadingOverlay(false);
         setDiagnosisState('results');
 
+        const summary = formatBacktestSummary(backtestResult.results);
+        setAnalysisResult(summary);
+        setBacktestId(backtestResult.backtest_id);
+        setBacktestResults(backtestResult);
+
         const durationMs = Date.now() - diagnosisStartTime;
-        await userTracking.trackDiagnosisClick({
+        userTracking.trackDiagnosisClick({
           stockCode: stockCode,
           stockName: stockData.info.name,
           durationMs: durationMs
         });
-      }
+      }, 600);
+
     } catch (err) {
-      console.error('Diagnosis error:', err);
-      let errorMessage = '情報取得中にエラーが発生しました';
+      console.error('Backtest error:', err);
+      let errorMessage = 'バックテスト実行中にエラーが発生しました';
 
       if (err instanceof Error) {
-        if (err.name === 'AbortError') {
-          errorMessage = 'リクエストがタイムアウトしました';
-        } else {
-          errorMessage = err.message;
-        }
+        errorMessage = err.message;
       }
 
       setError(errorMessage);
@@ -452,6 +373,7 @@ export default function NewHome() {
           isConnecting={diagnosisState === 'connecting'}
           onLineConversion={handleLineConversion}
           gclid={urlParams.gclid}
+          backtestId={backtestId}
         />
       </div>
     </div>
