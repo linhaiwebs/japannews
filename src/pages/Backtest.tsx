@@ -12,6 +12,7 @@ export default function Backtest() {
   const [error, setError] = useState<string>('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [customParams, setCustomParams] = useState<Record<string, any>>({});
 
   useEffect(() => {
     loadStrategies();
@@ -33,6 +34,7 @@ export default function Backtest() {
       setStrategies(strategyList);
       if (strategyList.length > 0) {
         setSelectedStrategy(strategyList[0].id);
+        setCustomParams(strategyList[0].default_params || {});
       }
     } catch (err) {
       console.error('Failed to load strategies:', err);
@@ -54,6 +56,7 @@ export default function Backtest() {
       const result = await executeBacktest({
         stockCode,
         strategyId: selectedStrategy,
+        strategyParams: customParams,
         startDate,
         endDate
       });
@@ -73,6 +76,25 @@ export default function Backtest() {
 
   const formatPercent = (value: number) => {
     return `${value.toFixed(2)}%`;
+  };
+
+  const formatParamLabel = (key: string): string => {
+    const labels: Record<string, string> = {
+      'short_period': '短期期間',
+      'long_period': '長期期間',
+      'rsi_period': 'RSI期間',
+      'rsi_oversold': 'RSI売られすぎ',
+      'rsi_overbought': 'RSI買われすぎ',
+      'macd_fast': 'MACD高速',
+      'macd_slow': 'MACD低速',
+      'macd_signal': 'MACDシグナル',
+      'bb_period': 'ボリンジャーバンド期間',
+      'bb_std': 'ボリンジャーバンド標準偏差',
+      'stop_loss_pct': '損切り率 (%)',
+      'take_profit_pct': '利確率 (%)',
+      'position_size_pct': 'ポジションサイズ (%)',
+    };
+    return labels[key] || key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
 
   return (
@@ -110,7 +132,14 @@ export default function Backtest() {
               </label>
               <select
                 value={selectedStrategy}
-                onChange={(e) => setSelectedStrategy(e.target.value)}
+                onChange={(e) => {
+                  const strategyId = e.target.value;
+                  setSelectedStrategy(strategyId);
+                  const strategy = strategies.find(s => s.id === strategyId);
+                  if (strategy) {
+                    setCustomParams(strategy.default_params || {});
+                  }
+                }}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 {strategies.map((strategy) => (
@@ -152,6 +181,33 @@ export default function Backtest() {
               <p className="text-gray-700">
                 {strategies.find(s => s.id === selectedStrategy)?.strategy_description}
               </p>
+            </div>
+          )}
+
+          {selectedStrategy && Object.keys(customParams).length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">戦略パラメータ設定</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {Object.entries(customParams).map(([key, value]) => (
+                  <div key={key}>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      {formatParamLabel(key)}
+                    </label>
+                    <input
+                      type="number"
+                      value={value}
+                      onChange={(e) => {
+                        setCustomParams({
+                          ...customParams,
+                          [key]: parseFloat(e.target.value) || 0
+                        });
+                      }}
+                      step={key.includes('ratio') || key.includes('percent') ? '0.01' : '1'}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
